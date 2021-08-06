@@ -4,7 +4,10 @@ body {
 
 a {
     text-decoration: none;
+}
 
+a:visited {
+    color: blue;
 }
 
 h1 {
@@ -52,4 +55,10 @@ p {
     #index {
         border-right: none;
     }
+}
+
+.darkmode {
+    color: white !important;
+    background-color: black !important;
+    border-color: white !important;
 }

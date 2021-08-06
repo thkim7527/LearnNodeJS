@@ -1,13 +1,5 @@
-let isDarkMode;
-
-function toggleDarkMode() {
-    if(isDarkMode) {
-        document.querySelector('body').style.backgroundColor = 'white';
-        document.querySelector('body').style.color = 'black';
-        isDarkMode = false;
-    } else {
-        document.querySelector('body').style.backgroundColor = 'black';
-        document.querySelector('body').style.color = 'white';
-        isDarkMode = true;
-    }
+function toggleDarkmode() {
+    document.body.classList.toggle("darkmode");
+    document.querySelector("h1").classList.toggle("darkmode");
+    document.querySelector("#index").classList.toggle("darkmode");
 }
