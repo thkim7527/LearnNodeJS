@@ -2,20 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const url = require('url');
 
-//ToDo
-const indexList = fs.readdir("./data", (err, fileList) => {
-    let indexList = `<ul>`;
-    for(i=0; i < fileList.length; i++) {
-        indexList += `<li><a href="?id=${fileList[i]}">${fileList[i]}</a></li>`;
-    }
-    indexList += `</ul>`
-    
-    return indexList;
-});
-
-function templateHTML(title) {
-    fs.readFile(`./data/${title}`, (err, description) => {
-        const template = `
+function templateHTML(indexList, title, description) {
+    const template = `
         <!DOCTYPE html>
         <html>
             <head>
@@ -25,7 +13,7 @@ function templateHTML(title) {
             </head>
     
             <body>
-                <h1><a href="/">Web</a></h1>
+                <h1><a href="?id=Web">Web</a></h1>
                 ${indexList}
                 <h2>${title}</h2>
                 <button onclick="toggleDarkmode()">Darkmode</button>
@@ -33,9 +21,8 @@ function templateHTML(title) {
                 <script src="script.js"></script>
             </body>
         </html>
-        `;
-        return template;
-    });
+    `;
+    return template
 }
 
 const app = http.createServer(function(request,response){
@@ -45,15 +32,36 @@ const app = http.createServer(function(request,response){
     let title = query.id;
 
     if(pathname === '/') {
-        if(title === undefined) {
-            title = 'Web';
-            const template = templateHTML(title);    
-            response.writeHead(200);
-            response.end(template);
+        if(pathname === undefined) {
+            fs.readdir("./data", (err, fileList) => {
+                let indexList = `<ul>`;
+                for(i=0; i < fileList.length; i++) {
+                    indexList += `<li><a href="?id=${fileList[i]}">${fileList[i]}</a></li>`
+                }
+                indexList += `</ul>`
+
+                title = "Web"
+
+                fs.readFile(`./data/${title}`, (err, description) => {
+                    const template = templateHTML(indexList, title, description);    
+                    response.writeHead(200);
+                    response.end(template);
+                })  
+            })
         } else {
-            const template = templateHTML(title);
-            response.writeHead(200);
-            response.end(template);
+            fs.readdir("./data", (err, fileList) => {
+                let indexList = `<ul>`;
+                for(i=0; i < fileList.length; i++) {
+                    indexList += `<li><a href="?id=${fileList[i]}">${fileList[i]}</a></li>`
+                }
+                indexList += `</ul>`
+
+                fs.readFile(`./data/${title}`, (err, description) => {
+                    const template = templateHTML(indexList, title, description);    
+                    response.writeHead(200);
+                    response.end(template);
+                })  
+            })
         }
     } else {
         response.writeHead(404);
