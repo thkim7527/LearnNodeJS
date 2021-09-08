@@ -16,7 +16,6 @@ function templateHTML(indexList, title, description) {
                 <h1><a href="?id=Web">Web</a></h1>
                 ${indexList}
                 <h2>${title}</h2>
-                <button onclick="toggleDarkmode()">Darkmode</button>
                 ${description}
                 <script src="script.js"></script>
             </body>
