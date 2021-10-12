@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
-const qs = require('querystring')
+const qs = require('querystring');
 
 function getTemplate(title, list, body) {
     return `
@@ -20,23 +20,23 @@ function getTemplate(title, list, body) {
                 ${body}
             </body>
         </html>
-    `
+    `;
 }
 
 function getList(fileList) {
     let listHTML = `<ul>`;
     for(i=0; i < fileList.length; i++) {
-        listHTML += `<li><a href="?id=${fileList[i]}">${fileList[i]}</a></li>`
+        listHTML += `<li><a href="?id=${fileList[i]}">${fileList[i]}</a></li>`;
     }
-    listHTML += `</ul>`
+    listHTML += `</ul>`;
 
-    return listHTML
+    return listHTML;
 }
 
-const app = http.createServer(function(request, response){
-    const _url = request.url;
-    const query = url.parse(_url, true).query;
-    const pathname = url.parse(_url, true).pathname;
+const app = http.createServer(function(req, res){
+    const reqURL = req.url;
+    const query = url.parse(reqURL, true).query; //url.parse is Deprecated!
+    const pathname = url.parse(reqURL, true).pathname; //url.parse is Deprecated!
     let title = query.id;
 
     switch(pathname) {
@@ -44,15 +44,15 @@ const app = http.createServer(function(request, response){
             if(title === undefined) {
                 fs.readdir("./data", (err, fileList) => {
                     fs.readFile(`./data/${title}`, (err, description) => {
-                        response.writeHead(200);
-                        response.end(getTemplate("Web", getList(fileList), description));
+                        res.writeHead(200);
+                        res.end(getTemplate("Web", getList(fileList), description));
                     })
                 })
             } else {
                 fs.readdir("./data", (err, fileList) => {
                     fs.readFile(`./data/${title}`, (err, description) => {
-                        response.writeHead(200);
-                        response.end(getTemplate(title, getList(fileList), description));
+                        res.writeHead(200);
+                        res.end(getTemplate(title, getList(fileList), description));
                     })
                 })
             }
@@ -65,62 +65,32 @@ const app = http.createServer(function(request, response){
                         <input type="text" name="description" placeholder="Description"/>
                         <input type="submit"/>
                     <form/>
-                `
-                response.writeHead(200);
-                response.end(getTemplate("Create", getList(fileList), description))
+                `;
+                res.writeHead(200);
+                res.end(getTemplate("Create", getList(fileList), description));
             })
             break;
         case "/submit":
             let query = '';
-            request.on('data', function(data){
+            req.on('data', function(data){
                 query += data;
             });
-            request.on('end', function(){
+            req.on('end', function(){
                 let post = qs.parse(query);
                 let title = post.title;
                 let description = post.description;
 
-                console.log(title)
-                console.log(description)
+                console.log(title);
+                console.log(description);
             });
 
-            response.writeHead(200)
-            response.end(getTemplate("Create Success", "", ""))
+            res.writeHead(200);
+            res.end(getTemplate("Create Success", "", ""));
             break;
         default:
-            response.writeHead(404);
-            response.end('Not Found');
+            res.writeHead(404);
+            res.end('Not Found');
     }
-
-    // if(pathname === '/') {
-    //     if(pathname === undefined) {
-    //         fs.readdir("./data", (err, fileList) => {
-    //             title = "Web"
-    //             const list = getList(fileList)
-    //
-    //             fs.readFile(`./data/${title}`, (err, description) => {
-    //                 response.writeHead(200);
-    //                 response.end(getTemplate(title, list, description));
-    //             })
-    //         })
-    //     } else {
-    //         fs.readdir("./data", (err, fileList) => {
-    //             const list = getList(fileList)
-    //
-    //             fs.readFile(`./data/${title}`, (err, description) => {
-    //                 response.writeHead(200);
-    //                 response.end(getTemplate(title, list, description));
-    //             })
-    //         })
-    //     }
-    // } else if(pathname === '/create') {
-    //     fs.readdir("./data", (err, fileList) => {
-    //
-    //     })
-    // } else {
-    //     response.writeHead(404);
-    //     response.end('Not Found');
-    // }
 });
 
 app.listen(80);
