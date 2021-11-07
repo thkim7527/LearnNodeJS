@@ -1,0 +1,22 @@
+{
+  "name": "learnnodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thkim7527/LearnNodeJS.git"
+  },
+  "author": "thkim7527",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thkim7527/LearnNodeJS/issues"
+  },
+  "homepage": "https://github.com/thkim7527/LearnNodeJS#readme"
+}
