@@ -1,3 +1,107 @@
+import fs from "fs"
+import url from "url"
+import qs from "qs"
+import express from "express"
+import {template} from "./lib/template.js"
+
+const app = express();
+
+//VIEW(HOME)
+app.get("/", (req, res) => {
+    const title = "Web";
+    const description = "Hello, Web!";
+    const fileList = fs.readdirSync("./data");
+
+    res.status(200).send(template.template(title, template.list(fileList), description));
+});
+
+//VIEW
+app.get("/view/:title", (req, res) => {
+    const title = req.params.title;
+    const description = fs.readFileSync(`./data/${title}`);
+    const fileList = fs.readdirSync("./data");
+    
+    res.status(200).send(template.template(title, template.list(fileList), description));
+});
+
+//CREATE
+app.get("/create", (req, res) => {
+    const title = "Create"
+    const description = `
+        <form method="post" action="/create-submit">
+            <p>
+            <input type="text" name="title" placeholder="Title"/>
+            <p/>
+        
+            <p>
+            <textarea name="description" placeholder="Description"></textarea>
+            <p/>
+        
+            <input type="submit"/>
+        <form/>
+    `
+    const fileList = fs.readdirSync("./data");
+    
+    res.status(200).send(template.template(title, template.list(fileList), description));
+});
+
+//CREATE SUBMIT
+app.post("/create-submit", (req, res) => {
+    let createData = "";
+    req.on("data", (data) => {
+        createData += data;
+    });
+    req.on("end", () => {
+        const post = qs.parse(createData);
+        console.log(post);
+
+        const title = post.title;
+        const description = post.description;
+        const fileList = fs.readdirSync("./data");
+        
+        fs.writeFileSync(`./data/${title}`, description);
+
+        res.set({Location: `/?id=${title}`});
+        res.status(302).send();
+    });
+});
+
+//UPDATE
+app.get("/update/:title", (req, res) => {
+    const title = "Update"
+    const description = `
+        <form method="post" action="/update_submit">
+            <input type="hidden" name="id" value="${title}">
+    
+            <p>
+            <input type="text" name="title" placeholder="Title" value="${title}"/>
+            <p/>
+
+            <p>
+            <textarea name="description" placeholder="Description">${description}</textarea>
+            <p/>
+
+            <input type="submit"/>
+        <form/>
+    `;
+    const fileList = fs.readdirSync("./data");
+
+    res.status(200).send(template.template(title, template.list(fileList), description));
+});
+
+//DELETE
+app.get("/delete/:title", (req, res) => {
+    const title = req.params.title;
+
+    fs.unlink(`./data/${title}`, () => {
+        res.set({Location: "/"});
+        res.status("302").send();
+    })
+});
+
+app.listen(80, console.log("Listening on Port 80"));
+
+/*
 import http from "http"
 import fs from "fs"
 import url from "url"
@@ -115,3 +219,4 @@ http.createServer(function(req, res){
             res.end("Not Found");
     }
 }).listen(80, console.log("Listening on Port 80"));
+*/
