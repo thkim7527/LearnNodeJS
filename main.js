@@ -1,18 +1,13 @@
-// const http = require('http');
-// const fs = require('fs');
-// const url = require('url');
-// const qs = require('querystring');
-
 import http from "http"
 import fs from "fs"
 import url from "url"
 import qs from "querystring"
 import {template} from "./lib/template.js";
 
-const app = http.createServer(function(req, res){
+http.createServer(function(req, res){
     const reqURL = req.url;
-    const query = url.parse(reqURL, true).query; //url.parse is Deprecated!
-    const pathname = url.parse(reqURL, true).pathname; //url.parse is Deprecated!
+    const query = url.parse(reqURL, true).query;
+    const pathname = url.parse(reqURL, true).pathname;
     let title = query.id;
 
     switch(pathname) {
@@ -119,6 +114,4 @@ const app = http.createServer(function(req, res){
             res.writeHead(404);
             res.end("Not Found");
     }
-});
-
-app.listen(80);
+}).listen(80, console.log("Listening on Port 80"));
