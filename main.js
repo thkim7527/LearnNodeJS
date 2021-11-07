@@ -1,37 +1,13 @@
-const http = require('http');
-const fs = require('fs');
-const url = require('url');
-const qs = require('querystring');
+// const http = require('http');
+// const fs = require('fs');
+// const url = require('url');
+// const qs = require('querystring');
 
-function getTemplate(title, list, body) {
-    return `
-        <!DOCTYPE html>
-        <html lang="en">
-            <head>
-                <meta charset="utf-8">
-                <title>Web</title>
-            </head>
-
-            <body>
-                <h1><a href="?id=Web">Web</a></h1>
-                ${list}
-                <a href="/create">Create</a>
-                <h2>${title}</h2>
-                ${body}
-            </body>
-        </html>
-    `;
-}
-
-function getList(fileList) {
-    let listHTML = `<ul>`;
-    for(i=0; i < fileList.length; i++) {
-        listHTML += `<li><a href="?id=${fileList[i]}">${fileList[i]}</a></li>`;
-    }
-    listHTML += `</ul>`;
-
-    return listHTML;
-}
+import http from "http"
+import fs from "fs"
+import url from "url"
+import qs from "querystring"
+import {template} from "./lib/template.js";
 
 const app = http.createServer(function(req, res){
     const reqURL = req.url;
@@ -45,51 +21,103 @@ const app = http.createServer(function(req, res){
                 fs.readdir("./data", (err, fileList) => {
                     fs.readFile(`./data/${title}`, (err, description) => {
                         res.writeHead(200);
-                        res.end(getTemplate("Web", getList(fileList), description));
+                        res.end(template.template("Web", template.list(fileList), description));
                     })
                 })
             } else {
                 fs.readdir("./data", (err, fileList) => {
                     fs.readFile(`./data/${title}`, (err, description) => {
                         res.writeHead(200);
-                        res.end(getTemplate(title, getList(fileList), description));
+                        res.end(template.template(title, template.list(fileList), description));
                     })
                 })
             }
             break;
         case "/create":
             fs.readdir("./data", (err, fileList) => {
-                const description = `
-                    <form method="post" action="/submit">
+                const body = `
+                    <form method="post" action="/create_submit">
+                        <p>
                         <input type="text" name="title" placeholder="Title"/>
-                        <input type="text" name="description" placeholder="Description"/>
+                        <p/>
+
+                        <p>
+                        <textarea name="description" placeholder="Description"></textarea>
+                        <p/>
+
                         <input type="submit"/>
                     <form/>
                 `;
                 res.writeHead(200);
-                res.end(getTemplate("Create", getList(fileList), description));
-            })
-            break;
-        case "/submit":
-            let query = '';
-            req.on('data', function(data){
-                query += data;
+                res.end(template.template("Create", template.list(fileList), body));
             });
-            req.on('end', function(){
-                let post = qs.parse(query);
+            break;
+        case "/create_submit":
+            let createData = "";
+            req.on("data", (data) => {
+                createData += data;
+            });
+            req.on("end", () => {
+                let post = qs.parse(createData);
                 let title = post.title;
                 let description = post.description;
 
-                console.log(title);
-                console.log(description);
+                fs.writeFile(`./data/${title}`, description, (err) => {
+                    res.writeHead(302, {Location: `/?id=${title}`});
+                    res.end();
+                });
             });
+            break;
+        case "/update":
+            fs.readdir("./data", (err, fileList) => {
+                fs.readFile(`./data/${title}`, (err, description) => {
+                    const body = `
+                    <form method="post" action="/update_submit">
+                        <input type="hidden" name="id" value="${title}">
+                        <p>
+                        <input type="text" name="title" placeholder="Title" value="${title}"/>
+                        <p/>
+    
+                        <p>
+                        <textarea name="description" placeholder="Description">${description}</textarea>
+                        <p/>
+    
+                        <input type="submit"/>
+                    <form/>
+                    `;
+                    res.writeHead(200);
+                    res.end(template.template("Update", template.list(fileList), body));
+                });
+            });
+            break;
+        case "/update_submit":
+            let updateData = ""
+            req.on("data", (data) => {
+                updateData += data
+            });
+            req.on("end", () => {
+                let post = qs.parse(updateData);
+                let id = post.id;
+                let title = post.title;
+                let description = post.description;
 
-            res.writeHead(200);
-            res.end(getTemplate("Create Success", "", ""));
+                fs.rename(`./data/${id}`, `./data/${title}`, (err) => {
+                    fs.writeFile(`./data/${title}`, description, (err) => {
+                        res.writeHead(302, {Location: `/?id=${title}`});
+                        res.end();
+                    });
+                });
+            });
+            break;
+        case "/delete_submit":
+            fs.unlink(`./data/${title}`, () => {
+                res.writeHead(302, {Location: "/"});
+                res.end()
+            })
             break;
         default:
             res.writeHead(404);
-            res.end('Not Found');
+            res.end("Not Found");
     }
 });
 

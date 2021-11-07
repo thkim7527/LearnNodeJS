@@ -18,5 +18,6 @@
   "bugs": {
     "url": "https://github.com/thkim7527/LearnNodeJS/issues"
   },
-  "homepage": "https://github.com/thkim7527/LearnNodeJS#readme"
+  "homepage": "https://github.com/thkim7527/LearnNodeJS#readme",
+  "type": "module"
 }
