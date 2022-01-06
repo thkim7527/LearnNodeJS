@@ -1,0 +1,5 @@
+- Sync -> Async
+- fs/promises
+- URL 대신 HTTP Method 사용
+- PUT Method 사용
+- 에러 처리

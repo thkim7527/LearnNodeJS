@@ -2,13 +2,13 @@
   "name": "learnnodejs",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "./src/index.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js"
+    "start": "nodemon"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,10 @@
   "homepage": "https://github.com/thkim7527/LearnNodeJS#readme",
   "type": "module",
   "dependencies": {
+    "body-parser": "^1.19.1",
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
